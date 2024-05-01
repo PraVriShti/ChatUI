@@ -43,7 +43,7 @@ export const Base = React.forwardRef<BaseModalHandle, ModalProps>((props, ref) =
     baseClass,
     active,
     className,
-    title,
+    // title,
     showClose = true,
     autoFocus = true,
     backdrop = true,
@@ -118,7 +118,9 @@ export const Base = React.forwardRef<BaseModalHandle, ModalProps>((props, ref) =
         <div className={`${baseClass}-content`}>
           <div className={`${baseClass}-header`}>
             <h5 className={`${baseClass}-title`} id={titleId}>
-              {title}
+              {/* {title} */}
+              <div style={{height: '2px', width: '55px', backgroundColor: '#B0B0B0', margin: 'auto'}}>
+              </div>
             </h5>
             {showClose && onClose && (
               <IconButton
