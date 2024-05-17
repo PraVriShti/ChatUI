@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useImperativeHandle } from 'react';
+import React, { useEffect, useRef, useImperativeHandle, useState } from 'react';
 import { createPortal } from 'react-dom';
 import clsx from 'clsx';
 import useMount from '../../hooks/useMount';
@@ -7,6 +7,8 @@ import { IconButton } from '../IconButton';
 import { Button, ButtonProps } from '../Button';
 import useNextId from '../../hooks/useNextId';
 import toggleClass from '../../utils/toggleClass';
+import DownIcon from './DownIcon';
+import UpIcon from './UpIcon';
 
 export interface ModalProps {
   active?: boolean;
@@ -58,6 +60,8 @@ export const Base = React.forwardRef<BaseModalHandle, ModalProps>((props, ref) =
     onClose,
   } = props;
 
+  const [collapsed, setCollapsed] = useState(true);
+
   const mid = useNextId('modal-');
   const titleId = props.titleId || mid;
 
@@ -99,6 +103,10 @@ export const Base = React.forwardRef<BaseModalHandle, ModalProps>((props, ref) =
 
   const isPopup = baseClass === 'Popup';
 
+  const toggleCollapse = () => {
+    setCollapsed((prev) => !prev);
+  };
+
   return createPortal(
     <div className={clsx(baseClass, className, { active: isShow })} ref={wrapperRef} tabIndex={-1}>
       {backdrop && (
@@ -114,9 +122,13 @@ export const Base = React.forwardRef<BaseModalHandle, ModalProps>((props, ref) =
         role="dialog"
         aria-labelledby={titleId}
         aria-modal
+        style={{ maxHeight: collapsed ? '150px' : 'none' }}
       >
         <div className={`${baseClass}-content`}>
           <div className={`${baseClass}-header`}>
+            <div onClick={toggleCollapse} style={{display: 'flex', justifyContent: 'flex-end', margin: '5px'}}>
+              {collapsed ? <UpIcon height="15px" width="15px" /> : <DownIcon height="15px" width="15px" />}
+            </div>
             <h5 className={`${baseClass}-title`} id={titleId}>
               {title}
               <div style={{height: '2px', width: '55px', backgroundColor: '#B0B0B0', margin: '10px auto 2px auto'}}>
@@ -132,16 +144,20 @@ export const Base = React.forwardRef<BaseModalHandle, ModalProps>((props, ref) =
               />
             )}
           </div>
-          <div className={clsx(`${baseClass}-body`, { overflow })}>{children}</div>
-          {actions && (
-            <div
-              className={`${baseClass}-footer ${baseClass}-footer--${vertical ? 'v' : 'h'}`}
-              data-variant={btnVariant || 'round'}
-            >
-              {actions.map((item) => (
-                <Button size="lg" block={isPopup} variant={btnVariant} {...item} key={item.label} />
-              ))}
-            </div>
+          {!collapsed && (
+            <>
+              <div className={clsx(`${baseClass}-body`, { overflow })}>{children}</div>
+              {actions && (
+                <div
+                  className={`${baseClass}-footer ${baseClass}-footer--${vertical ? 'v' : 'h'}`}
+                  data-variant={btnVariant || 'round'}
+                >
+                  {actions.map((item) => (
+                    <Button size="lg" block={isPopup} variant={btnVariant} {...item} key={item.label} />
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
