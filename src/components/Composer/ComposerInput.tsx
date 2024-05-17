@@ -212,7 +212,8 @@ export const ComposerInput = ({
             <div
               key={index}
               onClick={() => suggestionClickHandler(elem)}
-              className={`suggestion ${activeSuggestion === index ? 'active' : ''}`}
+              className={`suggestion`}
+              style={activeSuggestion === index ? {backgroundColor: '#65c3d7'} : {}}
               onMouseEnter={(e) => suggestionHandler(e, index)}
             >
               {elem}
