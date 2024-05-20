@@ -28,6 +28,7 @@ export interface ModalProps {
   onClose?: () => void;
   onBackdropClick?: () => void;
   children?: React.ReactNode;
+  isCollapsed?: boolean;
 }
 
 export interface BaseModalHandle {
@@ -58,9 +59,10 @@ export const Base = React.forwardRef<BaseModalHandle, ModalProps>((props, ref) =
     children,
     onBackdropClick,
     onClose,
+    isCollapsed
   } = props;
 
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(isCollapsed ?? true);
 
   const mid = useNextId('modal-');
   const titleId = props.titleId || mid;
