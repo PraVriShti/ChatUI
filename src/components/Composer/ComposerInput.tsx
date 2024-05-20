@@ -157,22 +157,23 @@ export const ComposerInput = ({
   };
 
   const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
+    (e: any) => {
+      if (e.keyCode === 229) return;
       if (suggestions.length > 0) {
-        if (e.key === 'ArrowUp') {
+        if (e.code === 'ArrowUp') {
           e.preventDefault();
           setActiveSuggestion((prevActiveSuggestion) =>
             prevActiveSuggestion > 0 ? prevActiveSuggestion - 1 : prevActiveSuggestion,
           );
-        } else if (e.key === 'ArrowDown') {
+        } else if (e.code === 'ArrowDown') {
           e.preventDefault();
           setActiveSuggestion((prevActiveSuggestion) =>
             prevActiveSuggestion < suggestions.length - 1
               ? prevActiveSuggestion + 1
               : prevActiveSuggestion,
           );
-        } else if (e.key === ' ') {
-          e.preventDefault();
+        } else if (e.data === ' ') {
+          e.preventDefault && e.preventDefault();
           if (activeSuggestion >= 0 && activeSuggestion < suggestions?.length) {
             suggestionClickHandler(suggestions[activeSuggestion]);
             setSuggestions([]);
@@ -194,9 +195,12 @@ export const ComposerInput = ({
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
+    let input = document.getElementById('inputBox');
+    input?.addEventListener('textInput', handleKeyDown);
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
+      input?.removeEventListener('textInput', handleKeyDown);
     };
   }, [handleKeyDown]);
 
@@ -208,7 +212,8 @@ export const ComposerInput = ({
             <div
               key={index}
               onClick={() => suggestionClickHandler(elem)}
-              className={`suggestion ${activeSuggestion === index ? 'active' : ''}`}
+              className={`suggestion`}
+              style={activeSuggestion === index ? {backgroundColor: '#65c3d7'} : {}}
               onMouseEnter={(e) => suggestionHandler(e, index)}
             >
               {elem}
@@ -218,6 +223,7 @@ export const ComposerInput = ({
       </div>
       <Input
         className="Composer-input"
+        id="inputBox"
         rows={1}
         autoSize
         enterKeyHint="send"

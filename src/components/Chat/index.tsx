@@ -155,6 +155,7 @@ export type ChatProps = Omit<ComposerProps, 'onFocus' | 'onChange' | 'onBlur'> &
     background?:string
     showTransliteration?:boolean
     transliterationConfig?:TransliterationConfig
+    showInput:boolean
   };
 
 export const Chat = React.forwardRef<HTMLDivElement, ChatProps>((props, ref) => {
@@ -190,6 +191,7 @@ export const Chat = React.forwardRef<HTMLDivElement, ChatProps>((props, ref) => 
     disableSend,
     showTransliteration,
     transliterationConfig,
+    showInput,
     btnColor,
     background,
     onImageSend,
@@ -254,7 +256,7 @@ export const Chat = React.forwardRef<HTMLDivElement, ChatProps>((props, ref) => 
             />
           )}
           
-         <Composer
+         {showInput && <Composer
             wideBreakpoint={wideBreakpoint}
             ref={composerRef}
             voiceToText={voiceToText}
@@ -279,7 +281,7 @@ export const Chat = React.forwardRef<HTMLDivElement, ChatProps>((props, ref) => 
             btnColor={btnColor}
             onImageSend={onImageSend}
             rightAction={rightAction}
-          />
+          />}
         </div>
       </div>
     </LocaleProvider>
