@@ -148,7 +148,7 @@ export const Base = React.forwardRef<BaseModalHandle, ModalProps>((props, ref) =
           </div>
           {!collapsed && (
             <>
-              <div className={clsx(`${baseClass}-body`, { overflow })}>{children}</div>
+              <div className={clsx(`${baseClass}-body`, { overflow })} style={{ maxHeight: height ? height : "70vh" }}>{children}</div>
               {actions && (
                 <div
                   className={`${baseClass}-footer ${baseClass}-footer--${vertical ? 'v' : 'h'}`}
