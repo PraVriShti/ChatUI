@@ -1,5 +1,4 @@
-import React, { useEffect, useRef, useImperativeHandle, useState } from 'react';
-import { createPortal } from 'react-dom';
+import React, { useEffect, useRef, useImperativeHandle } from 'react';
 import clsx from 'clsx';
 import useMount from '../../hooks/useMount';
 import { Backdrop } from '../Backdrop';
@@ -7,8 +6,6 @@ import { IconButton } from '../IconButton';
 import { Button, ButtonProps } from '../Button';
 import useNextId from '../../hooks/useNextId';
 import toggleClass from '../../utils/toggleClass';
-import DownIcon from './DownIcon';
-import UpIcon from './UpIcon';
 
 export interface ModalProps {
   active?: boolean;
@@ -31,6 +28,7 @@ export interface ModalProps {
   onBackdropClick?: () => void;
   children?: React.ReactNode;
   isCollapsed?: boolean;
+  bottom?: string;
 }
 
 export interface BaseModalHandle {
@@ -63,10 +61,9 @@ export const Base = React.forwardRef<BaseModalHandle, ModalProps>((props, ref) =
     children,
     onBackdropClick,
     onClose,
-    isCollapsed
+    bottom
   } = props;
 
-  const [collapsed, setCollapsed] = useState(isCollapsed ?? true);
 
   const mid = useNextId('modal-');
   const titleId = props.titleId || mid;
@@ -109,12 +106,8 @@ export const Base = React.forwardRef<BaseModalHandle, ModalProps>((props, ref) =
 
   const isPopup = baseClass === 'Popup';
 
-  const toggleCollapse = () => {
-    setCollapsed((prev) => !prev);
-  };
-
-  return createPortal(
-    <div className={clsx(baseClass, className, { active: isShow })} ref={wrapperRef} tabIndex={-1}>
+  return (
+    <div className={clsx(baseClass, className, { active: isShow })} ref={wrapperRef} tabIndex={-1} style={{bottom: bottom}}>
       {backdrop && (
         <Backdrop
           active={isShow}
@@ -128,13 +121,9 @@ export const Base = React.forwardRef<BaseModalHandle, ModalProps>((props, ref) =
         role="dialog"
         aria-labelledby={titleId}
         aria-modal
-        style={{ maxHeight: collapsed ? '150px' : 'none' }}
       >
         <div className={`${baseClass}-content`}>
           <div className={`${baseClass}-header`}>
-            <div onClick={toggleCollapse} style={{display: 'flex', justifyContent: 'flex-end', margin: '5px'}}>
-              {collapsed ? <UpIcon height="15px" width="15px" /> : <DownIcon height="15px" width="15px" />}
-            </div>
             <h5 className={`${baseClass}-title`} id={titleId} style={{color: titleColor || 'black', fontSize: titleSize || '16px'}}>
               {title}
               <div style={{height: '2px', width: '55px', backgroundColor: '#B0B0B0', margin: '10px auto 2px auto'}}>
@@ -150,7 +139,6 @@ export const Base = React.forwardRef<BaseModalHandle, ModalProps>((props, ref) =
               />
             )}
           </div>
-          {!collapsed && (
             <>
               <div className={clsx(`${baseClass}-body`, { overflow })} style={{ maxHeight: height ? height : "70vh" }}>{children}</div>
               {actions && (
@@ -164,10 +152,8 @@ export const Base = React.forwardRef<BaseModalHandle, ModalProps>((props, ref) =
                 </div>
               )}
             </>
-          )}
         </div>
       </div>
-    </div>,
-    document.body,
+    </div>
   );
 });

@@ -1,7 +1,13 @@
 .PullToRefresh {
   height: 100%;
   overflow-y: scroll;
+  overflow: -moz-scrollbars-none;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
   -webkit-overflow-scrolling: touch;
+  ::-webkit-scrollbar {
+    display: none;
+  }
 
   &-fallback {
     padding-top: var(--gutter);

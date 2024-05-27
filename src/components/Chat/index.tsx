@@ -244,7 +244,7 @@ export const Chat = React.forwardRef<HTMLDivElement, ChatProps>((props, ref) => 
           onBackBottomShow={onBackBottomShow}
           onBackBottomClick={onBackBottomClick}
         />
-        <div className="ChatFooter" style={{background: background ? background : ''}}>
+        {showInput && <div className="ChatFooter" style={{background: background ? background : ''}}>
           {renderQuickReplies ? (
             renderQuickReplies()
           ) : (
@@ -256,7 +256,7 @@ export const Chat = React.forwardRef<HTMLDivElement, ChatProps>((props, ref) => 
             />
           )}
           
-         {showInput && <Composer
+          <Composer
             wideBreakpoint={wideBreakpoint}
             ref={composerRef}
             voiceToText={voiceToText}
@@ -281,8 +281,8 @@ export const Chat = React.forwardRef<HTMLDivElement, ChatProps>((props, ref) => 
             btnColor={btnColor}
             onImageSend={onImageSend}
             rightAction={rightAction}
-          />}
-        </div>
+          />
+        </div>}
       </div>
     </LocaleProvider>
   );
