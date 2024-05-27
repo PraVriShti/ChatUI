@@ -15,6 +15,8 @@ export interface ModalProps {
   baseClass?: string;
   className?: string;
   title?: string;
+  titleColor?: string;
+  titleSize?: string;
   titleId?: string;
   showClose?: boolean;
   autoFocus?: boolean;
@@ -47,6 +49,8 @@ export const Base = React.forwardRef<BaseModalHandle, ModalProps>((props, ref) =
     active,
     className,
     title,
+    titleColor,
+    titleSize,
     showClose = true,
     autoFocus = true,
     backdrop = true,
@@ -131,7 +135,7 @@ export const Base = React.forwardRef<BaseModalHandle, ModalProps>((props, ref) =
             <div onClick={toggleCollapse} style={{display: 'flex', justifyContent: 'flex-end', margin: '5px'}}>
               {collapsed ? <UpIcon height="15px" width="15px" /> : <DownIcon height="15px" width="15px" />}
             </div>
-            <h5 className={`${baseClass}-title`} id={titleId}>
+            <h5 className={`${baseClass}-title`} id={titleId} style={{color: titleColor || 'black', fontSize: titleSize || '16px'}}>
               {title}
               <div style={{height: '2px', width: '55px', backgroundColor: '#B0B0B0', margin: '10px auto 2px auto'}}>
               </div>
