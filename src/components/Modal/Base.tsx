@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useImperativeHandle, useState } from 'react';
-import { createPortal } from 'react-dom';
 import clsx from 'clsx';
 import useMount from '../../hooks/useMount';
 import { Backdrop } from '../Backdrop';
@@ -113,7 +112,7 @@ export const Base = React.forwardRef<BaseModalHandle, ModalProps>((props, ref) =
     setCollapsed((prev) => !prev);
   };
 
-  return createPortal(
+  return (
     <div className={clsx(baseClass, className, { active: isShow })} ref={wrapperRef} tabIndex={-1}>
       {backdrop && (
         <Backdrop
@@ -167,7 +166,6 @@ export const Base = React.forwardRef<BaseModalHandle, ModalProps>((props, ref) =
           )}
         </div>
       </div>
-    </div>,
-    document.body,
+    </div>
   );
 });

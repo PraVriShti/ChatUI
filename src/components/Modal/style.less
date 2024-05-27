@@ -1,11 +1,12 @@
 .Modal,
 .Popup {
-  position: fixed;
+  position: relative;
   // top: 0;
   right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: @zindex-modal;
+  bottom: -10px;
+  left: -10px;
+  width: 100vw;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: center;
