@@ -6,6 +6,7 @@ import { IconButton } from '../IconButton';
 import { Button, ButtonProps } from '../Button';
 import useNextId from '../../hooks/useNextId';
 import toggleClass from '../../utils/toggleClass';
+import BackIcon from './BackIcon';
 
 export interface ModalProps {
   active?: boolean;
@@ -29,6 +30,8 @@ export interface ModalProps {
   children?: React.ReactNode;
   isCollapsed?: boolean;
   bottom?: string;
+  showBack?: boolean;
+  handleBack?: () => void;
 }
 
 export interface BaseModalHandle {
@@ -61,9 +64,10 @@ export const Base = React.forwardRef<BaseModalHandle, ModalProps>((props, ref) =
     children,
     onBackdropClick,
     onClose,
-    bottom
+    bottom,
+    showBack,
+    handleBack
   } = props;
-
 
   const mid = useNextId('modal-');
   const titleId = props.titleId || mid;
@@ -107,7 +111,12 @@ export const Base = React.forwardRef<BaseModalHandle, ModalProps>((props, ref) =
   const isPopup = baseClass === 'Popup';
 
   return (
-    <div className={clsx(baseClass, className, { active: isShow })} ref={wrapperRef} tabIndex={-1} style={{bottom: bottom}}>
+    <div
+      className={clsx(baseClass, className, { active: isShow })}
+      ref={wrapperRef}
+      tabIndex={-1}
+      style={{ bottom: bottom }}
+    >
       {backdrop && (
         <Backdrop
           active={isShow}
@@ -123,11 +132,21 @@ export const Base = React.forwardRef<BaseModalHandle, ModalProps>((props, ref) =
         aria-modal
       >
         <div className={`${baseClass}-content`}>
-          <div className={`${baseClass}-header`}>
-            <h5 className={`${baseClass}-title`} id={titleId} style={{color: titleColor || 'black', fontSize: titleSize || '16px'}}>
+          <div className={`${baseClass}-header`} style={{ display: 'flex', alignItems: 'center' }}>
+            {showBack && <div onClick={handleBack}>
+              <BackIcon />
+            </div>}
+            <h5
+              className={`${baseClass}-title`}
+              id={titleId}
+              style={{
+                color: titleColor || 'black',
+                fontSize: titleSize || '16px',
+                flex: 1,
+                paddingRight: showBack ? '25px' : '0',
+              }}
+            >
               {title}
-              <div style={{height: '2px', width: '55px', backgroundColor: '#B0B0B0', margin: '10px auto 2px auto'}}>
-              </div>
             </h5>
             {showClose && onClose && (
               <IconButton
@@ -139,19 +158,38 @@ export const Base = React.forwardRef<BaseModalHandle, ModalProps>((props, ref) =
               />
             )}
           </div>
-            <>
-              <div className={clsx(`${baseClass}-body`, { overflow })} style={{ maxHeight: height ? height : "70vh" }}>{children}</div>
-              {actions && (
-                <div
-                  className={`${baseClass}-footer ${baseClass}-footer--${vertical ? 'v' : 'h'}`}
-                  data-variant={btnVariant || 'round'}
-                >
-                  {actions.map((item) => (
-                    <Button size="lg" block={isPopup} variant={btnVariant} {...item} key={item.label} />
-                  ))}
-                </div>
-              )}
-            </>
+          <div
+            style={{
+              height: '2px',
+              width: '55px',
+              backgroundColor: '#B0B0B0',
+              margin: '10px auto 2px auto',
+            }}
+          ></div>
+          <>
+            <div
+              className={clsx(`${baseClass}-body`, { overflow })}
+              style={{ maxHeight: height ? height : '70vh' }}
+            >
+              {children}
+            </div>
+            {actions && (
+              <div
+                className={`${baseClass}-footer ${baseClass}-footer--${vertical ? 'v' : 'h'}`}
+                data-variant={btnVariant || 'round'}
+              >
+                {actions.map((item) => (
+                  <Button
+                    size="lg"
+                    block={isPopup}
+                    variant={btnVariant}
+                    {...item}
+                    key={item.label}
+                  />
+                ))}
+              </div>
+            )}
+          </>
         </div>
       </div>
     </div>
