@@ -222,6 +222,7 @@ export const ComposerInput = ({
         })}
       </div>
       <Input
+        data-testid="chatui-input-field"
         className="Composer-input"
         id="inputBox"
         rows={1}
