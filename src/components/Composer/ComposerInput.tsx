@@ -5,7 +5,7 @@ import { SendConfirm } from '../SendConfirm';
 import riseInput from './riseInput';
 import parseDataTransfer from '../../utils/parseDataTransfer';
 import canUse from '../../utils/canUse';
-import { TransliterationConfig } from '../Chat';
+import { LangDetectionConfig, TransliterationConfig } from '../Chat';
 
 const canTouch = canUse('touch');
 
@@ -15,6 +15,7 @@ interface ComposerInputProps extends InputProps {
   onImageSend?: (file: File) => Promise<any>;
   showTransliteration: boolean;
   transliterationConfig: TransliterationConfig | null;
+  langDetectionConfig: LangDetectionConfig | null;
   cursorPosition: number;
   setCursorPosition: any;
 }
@@ -26,6 +27,7 @@ export const ComposerInput = ({
   disabled,
   showTransliteration,
   transliterationConfig,
+  langDetectionConfig,
   value,
   onChange,
   cursorPosition,
@@ -181,6 +183,14 @@ export const ComposerInput = ({
             //@ts-ignore
             onChange(prevInputMsg + ' ');
           }
+        }
+      } else if (e.key === ' ') {
+        if (langDetectionConfig?.languagePopupFlag) {
+          langDetectionConfig?.detectLanguage(value as string | number).then((res) => {
+            if (res?.language === langDetectionConfig?.match) {
+              langDetectionConfig?.setShowLanguagePopup(true);
+            }
+          });
         }
       }
     },
