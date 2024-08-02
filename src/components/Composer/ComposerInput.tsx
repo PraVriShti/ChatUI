@@ -185,7 +185,7 @@ export const ComposerInput = ({
           }
         }
       } else if (e.key === ' ') {
-        if (langDetectionConfig?.languagePopupFlag && (typeof value === 'string')) {
+        if (langDetectionConfig?.languagePopupFlag && (typeof value === 'string') && langDetectionConfig?.langCheck) {
           langDetectionConfig?.detectLanguage(value?.trim()?.split(' ')?.pop() || "").then((res) => {
             if (res?.language === langDetectionConfig?.match) {
               langDetectionConfig?.setShowLanguagePopup(true);
