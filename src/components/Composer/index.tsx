@@ -32,7 +32,7 @@ export type ComposerProps = {
   inputType?: InputType;
   onInputTypeChange?: (inputType: InputType) => void;
   recorder?: RecorderProps;
-  onSend: (type: string, content: string) => void;
+  onSend: (type: string, content: string, setContent?: any) => void;
   onImageSend?: (file: File) => Promise<any>;
   onFocus?: (event: React.FocusEvent<HTMLTextAreaElement>) => void;
   onChange?: (value: string, event: React.ChangeEvent<Element>) => void;
@@ -194,8 +194,7 @@ export const Composer = React.forwardRef<ComposerHandle, ComposerProps>((props, 
 
   const send = useCallback(() => {
     if (text) {
-      onSend('text', text);
-      setText('');
+      onSend('text', text, setText);
     } else if (textOnce) {
       onSend('text', textOnce);
     }

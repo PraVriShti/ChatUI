@@ -24,6 +24,8 @@ export type LangDetectionConfig = {
   setShowLanguagePopup: any;
   match: string;
   langCheck: boolean;
+  transliterate: boolean;
+  setTransliterate: any;
 }
 
 export type ChatProps = Omit<ComposerProps, 'onFocus' | 'onChange' | 'onBlur'> &

@@ -198,6 +198,36 @@ export const ComposerInput = ({
   );
 
   useEffect(() => {
+    if(langDetectionConfig?.transliterate && transliterationConfig){
+
+      fetch(transliterationConfig.transliterationApi, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          "inputLanguage": transliterationConfig.transliterationInputLanguage,
+          "outputLanguage": transliterationConfig.transliterationOutputLanguage,
+          "input": value,
+          "provider": transliterationConfig?.transliterationProvider || "bhashini",
+          "numSuggestions": transliterationConfig?.transliterationSuggestions || 3
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setSuggestions([]);
+          //@ts-ignore
+          onChange(data?.suggestions[0] || value);
+          langDetectionConfig?.setTransliterate(false);
+        })
+        .catch((error) => {
+          console.error('Error fetching transliteration:', error);
+        });
+
+    }
+  }, [langDetectionConfig?.transliterate])
+
+  useEffect(() => {
     if (suggestions.length === 1) {
       setSuggestions([]);
     }
