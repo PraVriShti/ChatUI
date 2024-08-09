@@ -5,7 +5,7 @@ import { SendConfirm } from '../SendConfirm';
 import riseInput from './riseInput';
 import parseDataTransfer from '../../utils/parseDataTransfer';
 import canUse from '../../utils/canUse';
-import { TransliterationConfig } from '../Chat';
+import { LangDetectionConfig, TransliterationConfig } from '../Chat';
 
 const canTouch = canUse('touch');
 
@@ -15,6 +15,7 @@ interface ComposerInputProps extends InputProps {
   onImageSend?: (file: File) => Promise<any>;
   showTransliteration: boolean;
   transliterationConfig: TransliterationConfig | null;
+  langDetectionConfig: LangDetectionConfig | null;
   cursorPosition: number;
   setCursorPosition: any;
 }
@@ -26,6 +27,7 @@ export const ComposerInput = ({
   disabled,
   showTransliteration,
   transliterationConfig,
+  langDetectionConfig,
   value,
   onChange,
   cursorPosition,
@@ -182,10 +184,48 @@ export const ComposerInput = ({
             onChange(prevInputMsg + ' ');
           }
         }
+      } else if (e.key === ' ') {
+        if (langDetectionConfig?.languagePopupFlag && (typeof value === 'string') && langDetectionConfig?.langCheck) {
+          langDetectionConfig?.detectLanguage(value?.trim()?.split(' ')?.pop() || "").then((res) => {
+            if (res?.language === langDetectionConfig?.match) {
+              langDetectionConfig?.setShowLanguagePopup(true);
+            }
+          });
+        }
       }
     },
     [activeSuggestion, suggestionClickHandler, suggestions],
   );
+
+  useEffect(() => {
+    if(langDetectionConfig?.transliterate && transliterationConfig){
+
+      fetch(transliterationConfig.transliterationApi, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          "inputLanguage": transliterationConfig.transliterationInputLanguage,
+          "outputLanguage": transliterationConfig.transliterationOutputLanguage,
+          "input": value,
+          "provider": transliterationConfig?.transliterationProvider || "bhashini",
+          "numSuggestions": transliterationConfig?.transliterationSuggestions || 3
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setSuggestions([]);
+          //@ts-ignore
+          onChange(data?.suggestions[0] || value);
+          langDetectionConfig?.setTransliterate(false);
+        })
+        .catch((error) => {
+          console.error('Error fetching transliteration:', error);
+        });
+
+    }
+  }, [langDetectionConfig?.transliterate])
 
   useEffect(() => {
     if (suggestions.length === 1) {
@@ -222,6 +262,7 @@ export const ComposerInput = ({
         })}
       </div>
       <Input
+        data-testid="chatui-input-field"
         className="Composer-input"
         id="inputBox"
         rows={1}

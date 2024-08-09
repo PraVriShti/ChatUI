@@ -18,6 +18,16 @@ export type TransliterationConfig = {
   transliterationProvider?:string;
 }
 
+export type LangDetectionConfig = {
+  detectLanguage: (text: string | number) => Promise<any>;
+  languagePopupFlag: boolean;
+  setShowLanguagePopup: any;
+  match: string;
+  langCheck: boolean;
+  transliterate: boolean;
+  setTransliterate: any;
+}
+
 export type ChatProps = Omit<ComposerProps, 'onFocus' | 'onChange' | 'onBlur'> &
   MessageContainerProps & {
     /**
@@ -155,6 +165,7 @@ export type ChatProps = Omit<ComposerProps, 'onFocus' | 'onChange' | 'onBlur'> &
     background?:string
     showTransliteration?:boolean
     transliterationConfig?:TransliterationConfig
+    langDetectionConfig?: LangDetectionConfig
     showInput:boolean
   };
 
@@ -191,6 +202,7 @@ export const Chat = React.forwardRef<HTMLDivElement, ChatProps>((props, ref) => 
     disableSend,
     showTransliteration,
     transliterationConfig,
+    langDetectionConfig,
     showInput,
     btnColor,
     background,
@@ -278,6 +290,7 @@ export const Chat = React.forwardRef<HTMLDivElement, ChatProps>((props, ref) => 
             disableSend={disableSend}
             showTransliteration={showTransliteration}
             transliterationConfig={transliterationConfig}
+            langDetectionConfig={langDetectionConfig}
             btnColor={btnColor}
             onImageSend={onImageSend}
             rightAction={rightAction}

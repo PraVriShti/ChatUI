@@ -13,6 +13,7 @@ export const SendButton = ({ disabled, onClick, btnColor }: SendButtonProps) => 
   return (
     <div className="Composer-actions">
       <Button
+        data-testid="chatui-send-button"
         className="Composer-sendBtn"
         disabled={disabled}
         onMouseDown={onClick}
