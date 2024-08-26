@@ -116,38 +116,33 @@ export const ComposerInput = ({
     (e: any) => {
       //@ts-ignore
       const words = value.split(' ');
+      const cursorPos = cursorPosition;
+      let currentIndex = 0;
+      let selectedWord = '';
 
       // Find the word at the cursor position
-      const selectedWord = words.find(
-        (word: any) =>
-        //@ts-ignore
-        cursorPosition >= value.indexOf(word) &&
-        //@ts-ignore
-          cursorPosition <= value.indexOf(word) + word.length,
-      );
+      for (let word of words) {
+        if (currentIndex <= cursorPos && cursorPos <= currentIndex + word.length) {
+          selectedWord = word;
+          break;
+        }
+        currentIndex += word.length + 1; // +1 for space
+      }
 
-      if (selectedWord) {
+      if (selectedWord !== '') {
         // Replace the selected word with the transliterated suggestion
         //@ts-ignore
         const newInputMsg = value.replace(
           selectedWord,
           //@ts-ignore
-          cursorPosition === value.length ? e + ' ' : e,
+          cursorPosition === value.length ? e + ' ' : e
         );
 
         setSuggestions([]);
         setSuggestionClicked(true);
         setActiveSuggestion(0);
-
-        // Save and restore the cursor position
-        const restoredCursorPosition =
-          //@ts-ignore
-          cursorPosition - value.indexOf(selectedWord) + value.indexOf(e);
         //@ts-ignore
         onChange(newInputMsg, e);
-        setCursorPosition(restoredCursorPosition);
-        //@ts-ignore
-        inputRef.current && inputRef.current.focus();
       }
     },
     [value, cursorPosition, onChange],
@@ -174,11 +169,10 @@ export const ComposerInput = ({
               ? prevActiveSuggestion + 1
               : prevActiveSuggestion,
           );
-        } else if (e.data === ' ') {
-          e.preventDefault && e.preventDefault();
-          if (activeSuggestion >= 0 && activeSuggestion < suggestions?.length) {
+        } else if (e.key === ' ') {
+          e.preventDefault();
+          if (activeSuggestion >= 0 && activeSuggestion < suggestions.length) {
             suggestionClickHandler(suggestions[activeSuggestion]);
-            setSuggestions([]);
           } else {
             //@ts-ignore
             onChange(prevInputMsg + ' ');
@@ -226,12 +220,6 @@ export const ComposerInput = ({
 
     }
   }, [langDetectionConfig?.transliterate])
-
-  useEffect(() => {
-    if (suggestions.length === 1) {
-      setSuggestions([]);
-    }
-  }, [suggestions]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
