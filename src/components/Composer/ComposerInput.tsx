@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import clsx from 'clsx';
 import { Input, InputProps } from '../Input';
 import { SendConfirm } from '../SendConfirm';
@@ -38,6 +38,7 @@ export const ComposerInput = ({
   const [suggestions, setSuggestions] = useState([]);
   const [suggestionClicked, setSuggestionClicked] = useState(false);
   const [activeSuggestion, setActiveSuggestion] = useState<number>(0);
+  const controllerRef = useRef(new AbortController());
 
   const handlePaste = useCallback((e: React.ClipboardEvent<any>) => {
     parseDataTransfer(e, setPastedImage);
@@ -63,6 +64,7 @@ export const ComposerInput = ({
   }, [inputRef]);
 
   useEffect(() => {
+    const controller = controllerRef.current;
     if (
       value &&
       //@ts-ignore
@@ -98,8 +100,15 @@ export const ComposerInput = ({
           "provider": transliterationConfig?.transliterationProvider || "bhashini",
           "numSuggestions": transliterationConfig?.transliterationSuggestions || 3
         }),
+        signal: controller.signal,
       })
-        .then((response) => response.json())
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error(`Error fetching transliteration: ${response.statusText}`);
+        }
+      })
         .then((data) => {
           setSuggestions(data?.suggestions);
         })
@@ -109,6 +118,10 @@ export const ComposerInput = ({
     } else {
       setSuggestions([]);
     }
+    controllerRef.current = new AbortController();
+    return () => {
+      controller.abort();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, cursorPosition]);
 
@@ -116,38 +129,33 @@ export const ComposerInput = ({
     (e: any) => {
       //@ts-ignore
       const words = value.split(' ');
+      const cursorPos = cursorPosition;
+      let currentIndex = 0;
+      let selectedWord = '';
 
       // Find the word at the cursor position
-      const selectedWord = words.find(
-        (word: any) =>
-        //@ts-ignore
-        cursorPosition >= value.indexOf(word) &&
-        //@ts-ignore
-          cursorPosition <= value.indexOf(word) + word.length,
-      );
+      for (let word of words) {
+        if (currentIndex <= cursorPos && cursorPos <= currentIndex + word.length) {
+          selectedWord = word;
+          break;
+        }
+        currentIndex += word.length + 1; // +1 for space
+      }
 
-      if (selectedWord) {
+      if (selectedWord !== '') {
         // Replace the selected word with the transliterated suggestion
         //@ts-ignore
         const newInputMsg = value.replace(
           selectedWord,
           //@ts-ignore
-          cursorPosition === value.length ? e + ' ' : e,
+          cursorPosition === value.length ? e + ' ' : e
         );
 
         setSuggestions([]);
         setSuggestionClicked(true);
         setActiveSuggestion(0);
-
-        // Save and restore the cursor position
-        const restoredCursorPosition =
-          //@ts-ignore
-          cursorPosition - value.indexOf(selectedWord) + value.indexOf(e);
         //@ts-ignore
         onChange(newInputMsg, e);
-        setCursorPosition(restoredCursorPosition);
-        //@ts-ignore
-        inputRef.current && inputRef.current.focus();
       }
     },
     [value, cursorPosition, onChange],
@@ -174,11 +182,10 @@ export const ComposerInput = ({
               ? prevActiveSuggestion + 1
               : prevActiveSuggestion,
           );
-        } else if (e.data === ' ') {
-          e.preventDefault && e.preventDefault();
-          if (activeSuggestion >= 0 && activeSuggestion < suggestions?.length) {
+        } else if (e.key === ' ') {
+          e.preventDefault();
+          if (activeSuggestion >= 0 && activeSuggestion < suggestions.length) {
             suggestionClickHandler(suggestions[activeSuggestion]);
-            setSuggestions([]);
           } else {
             //@ts-ignore
             onChange(prevInputMsg + ' ');
@@ -226,12 +233,6 @@ export const ComposerInput = ({
 
     }
   }, [langDetectionConfig?.transliterate])
-
-  useEffect(() => {
-    if (suggestions.length === 1) {
-      setSuggestions([]);
-    }
-  }, [suggestions]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
