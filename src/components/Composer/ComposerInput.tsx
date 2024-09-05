@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import clsx from 'clsx';
 import { Input, InputProps } from '../Input';
 import { SendConfirm } from '../SendConfirm';
@@ -38,6 +38,7 @@ export const ComposerInput = ({
   const [suggestions, setSuggestions] = useState([]);
   const [suggestionClicked, setSuggestionClicked] = useState(false);
   const [activeSuggestion, setActiveSuggestion] = useState<number>(0);
+  const controllerRef = useRef(new AbortController());
 
   const handlePaste = useCallback((e: React.ClipboardEvent<any>) => {
     parseDataTransfer(e, setPastedImage);
@@ -63,6 +64,7 @@ export const ComposerInput = ({
   }, [inputRef]);
 
   useEffect(() => {
+    const controller = controllerRef.current;
     if (
       value &&
       //@ts-ignore
@@ -98,8 +100,15 @@ export const ComposerInput = ({
           "provider": transliterationConfig?.transliterationProvider || "bhashini",
           "numSuggestions": transliterationConfig?.transliterationSuggestions || 3
         }),
+        signal: controller.signal,
       })
-        .then((response) => response.json())
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error(`Error fetching transliteration: ${response.statusText}`);
+        }
+      })
         .then((data) => {
           setSuggestions(data?.suggestions);
         })
@@ -109,6 +118,10 @@ export const ComposerInput = ({
     } else {
       setSuggestions([]);
     }
+    controllerRef.current = new AbortController();
+    return () => {
+      controller.abort();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, cursorPosition]);
 
