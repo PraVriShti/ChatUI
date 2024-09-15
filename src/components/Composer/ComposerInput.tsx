@@ -132,30 +132,42 @@ export const ComposerInput = ({
       const cursorPos = cursorPosition;
       let currentIndex = 0;
       let selectedWord = '';
+      let selectedWordStart = 0;
 
       // Find the word at the cursor position
       for (let word of words) {
         if (currentIndex <= cursorPos && cursorPos <= currentIndex + word.length) {
           selectedWord = word;
+          selectedWordStart = currentIndex;
           break;
         }
         currentIndex += word.length + 1; // +1 for space
       }
 
       if (selectedWord !== '') {
+        //@ts-ignore
+        const spaceAfter = selectedWordStart + selectedWord.length <= value.length ? ' ' : '';
         // Replace the selected word with the transliterated suggestion
         //@ts-ignore
-        const newInputMsg = value.replace(
-          selectedWord,
-          //@ts-ignore
-          cursorPosition === value.length ? e + ' ' : e
-        );
+        const newInputMsg = value.substring(0, selectedWordStart) +
+        e +
+        spaceAfter +
+        //@ts-ignore
+        value.substring(selectedWordStart + selectedWord.length);
 
         setSuggestions([]);
         setSuggestionClicked(true);
         setActiveSuggestion(0);
         //@ts-ignore
         onChange(newInputMsg, e);
+
+        const newCursorPosition = selectedWordStart + e.length + spaceAfter.length;
+        setTimeout(() => {
+          if (inputRef.current) {
+            inputRef.current.setSelectionRange(newCursorPosition, newCursorPosition);
+            inputRef.current.focus();
+          }
+        }, 0);
       }
     },
     [value, cursorPosition, onChange],
@@ -182,7 +194,7 @@ export const ComposerInput = ({
               ? prevActiveSuggestion + 1
               : prevActiveSuggestion,
           );
-        } else if (e.key === ' ') {
+        } else if (e.key === ' ' || e.code === 'Space' || e.keyCode === 32 || e.data === " ") {
           e.preventDefault();
           if (activeSuggestion >= 0 && activeSuggestion < suggestions.length) {
             suggestionClickHandler(suggestions[activeSuggestion]);
@@ -191,7 +203,7 @@ export const ComposerInput = ({
             onChange(prevInputMsg + ' ');
           }
         }
-      } else if (e.key === ' ') {
+      } else if (e.key === ' ' || e.code === 'Space' || e.keyCode === 32 || e.data === " ") {
         if (langDetectionConfig?.languagePopupFlag && (typeof value === 'string') && langDetectionConfig?.langCheck) {
           langDetectionConfig?.detectLanguage(value?.trim()?.split(' ')?.pop() || "").then((res) => {
             if (res?.language === langDetectionConfig?.match) {
