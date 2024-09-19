@@ -23,7 +23,9 @@ export type LangDetectionConfig = {
   languagePopupFlag: boolean;
   setShowLanguagePopup: any;
   match: string;
+  lang: string;
   langCheck: boolean;
+  locale: string;
   transliterate: boolean;
   setTransliterate: any;
 }
