@@ -19,10 +19,11 @@ export type TransliterationConfig = {
 }
 
 export type LangDetectionConfig = {
-  detectLanguage: (text: string | number) => Promise<any>;
+  detectLanguage: (text: string | number, provider: string | null, match: string) => Promise<any>;
   languagePopupFlag: boolean;
   setShowLanguagePopup: any;
   match: string;
+  provider: string | null;
   lang: string;
   langCheck: boolean;
   locale: string;

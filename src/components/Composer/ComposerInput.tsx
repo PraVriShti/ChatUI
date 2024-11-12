@@ -205,7 +205,7 @@ export const ComposerInput = ({
         }
       } else if (e.key === ' ' || e.code === 'Space' || e.keyCode === 32 || e.data === " ") {
         if (langDetectionConfig?.languagePopupFlag && (typeof value === 'string') && langDetectionConfig?.langCheck && langDetectionConfig?.lang !== langDetectionConfig?.locale) {
-          langDetectionConfig?.detectLanguage(value?.trim()?.split(' ')?.pop() || "").then((res) => {
+          langDetectionConfig?.detectLanguage(value?.trim()?.split(' ')?.pop() || "", langDetectionConfig?.provider, langDetectionConfig?.match).then((res) => {
             if (res?.language === langDetectionConfig?.match) {
               langDetectionConfig?.setShowLanguagePopup(true);
             }
