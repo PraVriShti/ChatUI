@@ -170,6 +170,7 @@ export type ChatProps = Omit<ComposerProps, 'onFocus' | 'onChange' | 'onBlur'> &
     transliterationConfig?:TransliterationConfig
     langDetectionConfig?: LangDetectionConfig
     showInput:boolean
+    disclaimer?:ReactElement
   };
 
 export const Chat = React.forwardRef<HTMLDivElement, ChatProps>((props, ref) => {
@@ -206,6 +207,7 @@ export const Chat = React.forwardRef<HTMLDivElement, ChatProps>((props, ref) => 
     showTransliteration,
     transliterationConfig,
     langDetectionConfig,
+    disclaimer,
     showInput,
     btnColor,
     background,
@@ -248,6 +250,7 @@ export const Chat = React.forwardRef<HTMLDivElement, ChatProps>((props, ref) => 
     <LocaleProvider locale={locale} locales={locales}>
       <div className="ChatApp" ref={ref} style={{background: background ? background : ''}}>
         {renderNavbar ? renderNavbar() : navbar && <Navbar {...navbar} />}
+        {disclaimer && <div className="Chat-disclaimer">{disclaimer}</div>}
         <MessageContainer
           ref={messagesRef}
           loadMoreText={loadMoreText}
