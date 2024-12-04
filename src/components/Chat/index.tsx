@@ -250,8 +250,8 @@ export const Chat = React.forwardRef<HTMLDivElement, ChatProps>((props, ref) => 
     <LocaleProvider locale={locale} locales={locales}>
       <div className="ChatApp" ref={ref} style={{background: background ? background : ''}}>
         {renderNavbar ? renderNavbar() : navbar && <Navbar {...navbar} />}
-        {disclaimer && <div className="Chat-disclaimer">{disclaimer}</div>}
         <MessageContainer
+          disclaimer={disclaimer}
           ref={messagesRef}
           loadMoreText={loadMoreText}
           messages={messages}

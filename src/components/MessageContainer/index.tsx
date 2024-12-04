@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import React, { useState, useEffect, useRef, useCallback, useImperativeHandle } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useImperativeHandle, ReactElement } from 'react';
 import { PullToRefresh, PullToRefreshHandle, ScrollToEndOptions } from '../PullToRefresh';
 import { Message, MessageProps } from '../Message';
 import { BackBottom } from '../BackBottom';
@@ -10,6 +10,7 @@ import getToBottom from '../../utils/getToBottom';
 const listenerOpts = canUse('passiveListener') ? { passive: true } : false;
 
 export interface MessageContainerProps {
+  disclaimer: ReactElement;
   messages: MessageProps[];
   renderMessageContent: (message: MessageProps) => React.ReactNode;
   loadMoreText?: string;
@@ -33,6 +34,7 @@ function isNearBottom(el: HTMLElement, n: number) {
 export const MessageContainer = React.forwardRef<MessageContainerHandle, MessageContainerProps>(
   (props, ref) => {
     const {
+      disclaimer,
       messages,
       loadMoreText,
       onRefresh,
@@ -182,8 +184,9 @@ export const MessageContainer = React.forwardRef<MessageContainerHandle, Message
           onScroll={handleScroll}
           loadMoreText={loadMoreText}
           ref={scrollerRef}
-        >
+          >
           <div className="MessageList">
+          {disclaimer && <div className="Chat-disclaimer">{disclaimer}</div>}
             {messages.map((msg) => (
               <Message {...msg} renderMessageContent={renderMessageContent} key={msg._id} />
             ))}
